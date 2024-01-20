@@ -1,56 +1,8 @@
-### [ColaNacos](https://github.com/odinGitGmail/Cola.ColaNacos)
+﻿using Cola.Core.Models;
+using Cola.Core.Models.ColaNacos;
 
-[![Version](https://flat.badgen.net/nuget/v/Cola.ColaNacos?label=version)](https://github.com/odinGitGmail/Cola.ColaNacos) [![download](https://flat.badgen.net/nuget/dt/Cola.ColaNacos)](https://www.nuget.org/packages/Cola.ColaNacos) [![commit](https://flat.badgen.net/github/last-commit/odinGitGmail/Cola.ColaNacos)](https://flat.badgen.net/github/last-commit/odinGitGmail/Cola.ColaNacos) [![Blog](https://flat.badgen.net/static/blog/odinsam.com)](https://odinsam.com)
+namespace Cola.ColaNacos;
 
-
-#### 配置
-```json
-{
-  "ColaWebApi": [
-    {
-      "ClientName": "ColaNacos",
-      "BaseUri": "http://192.168.202.132:8848",
-      "TimeOut": 5000,
-      "Cert": {
-        "CertFilePath": "",
-        "CertFilePwd": ""
-      },
-      /* 默认压缩方式  None,GZip,Deflate,Brotli,All */
-      "Decompression": "All"
-    }
-  ],
-  "ColaNacos": {
-    // 子节点，名称可以自定义
-    "public": {
-      "EndPoint": "",
-      "Listeners": [
-        {
-          "Optional": false,
-          "DataId": "DEFAULT_ID",
-          "Group": "DEFAULT_GROUP"
-        }
-      ],
-      "ServerAddresses": [ "http://192.168.202.132:8848" ],
-      "Namespace": "",
-      "ConfigUseRpc": false,
-      "NamingUseRpc": false
-    }
-  }
-}
-```
-
-#### 注入
-```csharp
-// 必须注入核心组件
-builder.Services.AddColaCore();
-// 必须注入webapi
-builder.Services.AddColaHttpClient(config);
-// list 为 ColaNacos 的子节点，名称可以自定义
-builder.Services.AddColaNacos(config, new List<string>() { "public" });
-```
-
-#### 已实现接口
-```csharp
 public interface IColaNacos
 {
     #region 命名空间管理接口
@@ -96,5 +48,3 @@ public interface IColaNacos
     
     #endregion
 }
-```
-

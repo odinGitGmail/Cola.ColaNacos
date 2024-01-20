@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Version>1.0.1</Version>
+        <Title>Cola.ColaNacos</Title>
+        <Authors>OdinSam</Authors>
+        <Description>Cola.ColaNacos 框架</Description>
+        <Copyright>copyRight © 2023 OdinSam</Copyright>
+        <PackageProjectUrl>https://github.com/odinGitGmail/Cola.ColaNacos</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/odinGitGmail/Cola.ColaNacos</RepositoryUrl>
+        <PackageTags>nacos;cola</PackageTags>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <FileVersion>1.0.1</FileVersion>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>./readme.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="icon.png"  Pack="true" PackagePath="\" />
+        <EmbeddedResource Include="icon.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="readme.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.21\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+        <HintPath>C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.21\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Cola.ColaWebApi\Cola.ColaWebApi.csproj" />
+      <ProjectReference Include="..\Cola.Core\Cola.Core.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="nacos-sdk-csharp" Version="1.3.5" />
+    </ItemGroup>
+
+</Project>
