@@ -3,6 +3,7 @@ using Cola.Core.ColaConsole;
 using Cola.Core.ColaException;
 using Cola.Core.Models.ColaNacos.Config;
 using Cola.CoreUtils.Constants;
+using Cola.CoreUtils.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nacos.V2;
@@ -28,7 +29,7 @@ public static class ColaNacosInject
         var webApi = services.BuildServiceProvider().GetService<IWebApi>();
         if (webApi == null)
         {
-            new ColaException().ThrowIfNull(webApi,"需要先注入 IWebApi ");
+            new ColaException().ThrowIfNull(webApi,EnumException.ServiceInjectIsNull);
         }
         services.AddSingleton<IColaNacos, ColaNacos>();
         ConsoleHelper.WriteInfo("AddColaNacos 注入【 IColaNacos, ColaNacos 】");
