@@ -1,13 +1,15 @@
 ﻿using Cola.ColaWebApi;
 using Cola.Core.ColaConsole;
 using Cola.Core.ColaException;
+using Cola.Core.Models.ColaNacos;
 using Cola.Core.Models.ColaNacos.Config;
+using Cola.Core.Models.ColaNacos.Namespace;
 using Cola.CoreUtils.Constants;
-using Cola.CoreUtils.Enums;
+using Cola.CoreUtils.Extensions;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Nacos.V2;
-using Nacos.V2.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Cola.ColaNacos;
 
@@ -16,32 +18,94 @@ public static class ColaNacosInject
     /// <summary>
     /// AddColaNacos
     /// </summary>
-    /// <param name="services">services</param>
+    /// <param name="builder">services</param>
     /// <param name="configuration">configuration</param>
-    /// <param name="subSectionNames">subSectionNames</param>
+    /// <param name="webApiClientName">webApiClientName</param>
+    /// <param name="subSectionName">subSectionNames</param>
     /// <returns></returns>
-    public static IServiceCollection AddColaNacos(
-        this IServiceCollection services,
+    public static IHostBuilder AddColaNacos(
+        this WebApplicationBuilder builder,
         IConfiguration configuration,
-        List<string> subSectionNames)
+        string webApiClientName,
+        string subSectionName)
     {
-        services = InjectColaNacos(services, configuration, subSectionNames);
+        var services = builder.Services;
+        var exceptionHelper = services.BuildServiceProvider().GetService<IColaException>();
+        if (exceptionHelper == null)
+        {
+            throw new Exception("需要先注入 IColaException");
+        }
         var webApi = services.BuildServiceProvider().GetService<IWebApi>();
         if (webApi == null)
         {
-            new ColaException().ThrowIfNull(webApi,EnumException.ServiceInjectIsNull);
+            exceptionHelper.ThrowException("需要先注入 IWebApi 详请查看: https://github.com/odinGitGmail/Cola.ColaNacos");
         }
-        services.AddSingleton<IColaNacos, ColaNacos>();
-        ConsoleHelper.WriteInfo("AddColaNacos 注入【 IColaNacos, ColaNacos 】");
-        return services;
-    }
 
-    private static IServiceCollection InjectColaNacos(IServiceCollection services, IConfiguration configuration, List<string> subSectionNames)
-    {
-        foreach (var subSectionName in subSectionNames)
+        builder.Services.AddSingleton<IColaNacos, ColaNacos>();
+        
+        var colaNacos = services.BuildServiceProvider().GetService<IColaNacos>();
+        var nacosNsResult = colaNacos!.QueryNamespaceList(webApiClientName);
+        if (nacosNsResult != null)
         {
-            services.AddNacosV2Config(configuration.GetSection($"{SystemConstant.CONSTANT_COLANACOS_SECTION}:{subSectionName}"));
+            if (nacosNsResult.Code == 0)
+            {
+                var allNameSpaces = nacosNsResult.Data;
+                if (allNameSpaces != null && allNameSpaces.Count > 0)
+                {
+                    #region 自动注册所有子节点
+
+                    var colaNacosOption = configuration.GetColaSection<ColaNacosOption>(
+                        $"{SystemConstant.CONSTANT_COLANACOS_SECTION}:{subSectionName}");
+                    
+                    var allNs = allNameSpaces.Where(n => n.NamespaceShowName != "public")
+                        .Select(ns => ns.NamespaceShowName).ToList();
+                    var noRegisterNs = allNs.SingleOrDefault(
+                        ns => string.Compare(ns, subSectionName, StringComparison.CurrentCultureIgnoreCase) == 0);
+                    if (string.IsNullOrEmpty(noRegisterNs))
+                    {
+                        colaNacos!.CreateNamespace(webApiClientName, new NacosNamespace()
+                        {
+                            NamespaceId = colaNacosOption.Namespace,
+                            NamespaceName = subSectionName,
+                            NamespaceDesc = colaNacosOption.Description
+                        });
+                    }
+                    
+                    if (colaNacosOption.Listeners != null && colaNacosOption.Listeners.Count > 0)
+                    {
+                        var nacosConfigResult = colaNacos!.QueryConfigListByNamespace(webApiClientName, colaNacosOption.Namespace);
+                        if (nacosConfigResult != null && nacosConfigResult.Data != null)
+                        {
+                            var result = nacosConfigResult.Data.SingleOrDefault(
+                                cfg =>
+                                    cfg.DataId == colaNacosOption.Listeners[0].DataId &&
+                                    cfg.Group == colaNacosOption.Listeners[0].Group);
+                            if (result == null)
+                            {
+                                colaNacos!.PublishConfig(webApiClientName, new PublishNacosConfig()
+                                {
+                                    NamespaceId = colaNacosOption.Namespace,
+                                    Group = colaNacosOption.Listeners[0].Group,
+                                    DataId = colaNacosOption.Listeners[0].DataId,
+                                    Desc = colaNacosOption.Listeners[0].Description,
+                                    EnumConfigType = EnumNacosConfigType.JSON
+                                });
+                            }
+                        }
+                    }
+                    
+                    #endregion
+                }
+            }
+            else
+            {
+                exceptionHelper.ThrowException("查询 nacos 下所有的命名空间出错");
+            }
         }
-        return services;
+        
+        var host = builder.Host;
+        host.UseNacosConfig(section: $"{SystemConstant.CONSTANT_COLANACOS_SECTION}:{subSectionName}", parser: null, logAction: null);
+        ConsoleHelper.WriteInfo("AddColaNacos 注入【 IColaNacos, ColaNacos 】");
+        return host;
     }
 }

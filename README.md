@@ -34,6 +34,50 @@
       "Namespace": "",
       "ConfigUseRpc": false,
       "NamingUseRpc": false
+    },
+    "cola-Production": {
+      "EndPoint": "",
+      "Listeners": [
+        {
+          "Optional": false,
+          "DataId": "PRODUCTION_ID",
+          "Group": "PRODUCTION_GROUP"
+        }
+      ],
+      "ServerAddresses": [ "http://192.168.202.132:8848" ],
+      "Namespace": "",
+      "ConfigUseRpc": false,
+      "NamingUseRpc": false
+    },
+    "cola-Development": {
+      "EndPoint": "",
+      "Listeners": [
+        {
+          "Optional": false,
+          "DataId": "DEVELOPMENT_ID",
+          "Group": "DEVELOPMENT_GROUP"
+        }
+      ],
+      "ServerAddresses": [ "http://192.168.202.132:8848" ],
+      "Namespace": "",
+      "ConfigUseRpc": false,
+      "NamingUseRpc": false
+    },
+    "cola-Test": {
+      "EndPoint": "",
+      "Listeners": [
+        {
+          "Optional": false,
+          "DataId": "TEST_ID",
+          "Group": "TEST_GROUP",
+          "Description": "cola-Test-Config"
+        }
+      ],
+      "ServerAddresses": [ "http://192.168.202.132:8848" ],
+      "Namespace": "",
+      "ConfigUseRpc": false,
+      "NamingUseRpc": false,
+      "Description": "cola-Test"
     }
   }
 }

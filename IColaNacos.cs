@@ -1,8 +1,9 @@
 ﻿using Cola.Core.Models;
 using Cola.Core.Models.ColaNacos;
 using Cola.Core.Models.ColaNacos.Config;
+using Cola.Core.Models.ColaNacos.Instance;
 using Cola.Core.Models.ColaNacos.Namespace;
-using Cola.Core.Models.ColaNacos.Namespace.Service;
+using Cola.Core.Models.ColaNacos.Service;
 
 namespace Cola.ColaNacos;
 
@@ -77,6 +78,14 @@ public interface IColaNacos
     /// <returns>是否执行成功</returns>
     ApiResult<bool>? DeleteConfig(string clientName, DeleteNacosConfig nacosConfig);
 
+    /// <summary>
+    /// 查询指定命名空间下的配置列表
+    /// </summary>
+    /// <param name="clientName">clientName</param>
+    /// <param name="namespaceId">namespaceId</param>
+    /// <returns></returns>
+    ApiResult<List<ConfigListResult>>? QueryConfigListByNamespace(string clientName, string? namespaceId);
+
     #endregion
 
     #region 服务管理
@@ -106,6 +115,42 @@ public interface IColaNacos
     /// <param name="nacosServiceCreate">nacosServiceCreate</param>
     /// <returns>ApiResult&lt;NacosServiceListResult&gt;</returns>
     ApiResult<string>? CreateService(string clientName, NacosServiceCreate nacosServiceCreate);
+
+    #endregion
+    
+    #region 实例管理
+
+    /// <summary>
+    /// 查询指定服务的实例列表
+    /// </summary>
+    /// <param name="clientName">clientName</param>
+    /// <param name="nacosInstanceList">nacosInstance</param>
+    /// <returns></returns>
+    ApiResult<NacosInstanceListResult>? QueryInstanceList(string clientName, QueryNacosInstanceList nacosInstanceList);
+    
+    /// <summary>
+    /// 查询实例详情
+    /// </summary>
+    /// <param name="clientName">clientName</param>
+    /// <param name="nacosInstance">nacosInstance</param>
+    /// <returns></returns>
+    ApiResult<NacosInstanceResult>? QueryInstance(string clientName, QueryNacosInstance nacosInstance);
+    
+    /// <summary>
+    /// 注册实例
+    /// </summary>
+    /// <param name="clientName">clientName</param>
+    /// <param name="registerNacosInstance">registerNacosInstance</param>
+    /// <returns></returns>
+    ApiResult<string>? RegisterInstance(string clientName, RegisterNacosInstance registerNacosInstance);
+
+    /// <summary>
+    /// UnRegisterInstance
+    /// </summary>
+    /// <param name="clientName">clientName</param>
+    /// <param name="unRegisterNacosInstance">unRegisterNacosInstance</param>
+    /// <returns></returns>
+    ApiResult<string>? UnRegisterInstance(string clientName, RegisterNacosInstance unRegisterNacosInstance);
 
     #endregion
 }
