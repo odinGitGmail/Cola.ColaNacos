@@ -1,6 +1,6 @@
 ﻿using Cola.ColaWebApi;
 using Cola.Core.ColaConsole;
-using Cola.Core.ColaException;
+using Cola.Core.ColaEx;
 using Cola.Core.Models.ColaNacos;
 using Cola.Core.Models.ColaNacos.Config;
 using Cola.Core.Models.ColaNacos.Namespace;

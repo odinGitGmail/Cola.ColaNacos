@@ -1,5 +1,5 @@
 ﻿using Cola.ColaWebApi;
-using Cola.Core.ColaException;
+using Cola.Core.ColaEx;
 using Cola.Core.Models;
 using Cola.Core.Models.ColaNacos;
 using Cola.Core.Models.ColaNacos.Config;
