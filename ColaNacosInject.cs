@@ -31,6 +31,10 @@ public static class ColaNacosInject
     {
         var services = builder.Services;
         var exceptionHelper = services.BuildServiceProvider().GetService<IColaException>();
+        if (subSectionName.StringIsNullOrEmpty())
+        {
+            throw new Exception("subSectionName 不能为空");
+        }
         if (exceptionHelper == null)
         {
             throw new Exception("需要先注入 IColaException");
@@ -56,7 +60,7 @@ public static class ColaNacosInject
 
                     var colaNacosOption = configuration.GetColaSection<ColaNacosOption>(
                         $"{SystemConstant.CONSTANT_COLANACOS_SECTION}:{subSectionName}");
-                    
+
                     var allNs = allNameSpaces.Where(n => n.NamespaceShowName != "public")
                         .Select(ns => ns.NamespaceShowName).ToList();
                     var noRegisterNs = allNs.SingleOrDefault(
@@ -70,10 +74,11 @@ public static class ColaNacosInject
                             NamespaceDesc = colaNacosOption.Description
                         });
                     }
-                    
+
                     if (colaNacosOption.Listeners != null && colaNacosOption.Listeners.Count > 0)
                     {
-                        var nacosConfigResult = colaNacos!.QueryConfigListByNamespace(webApiClientName, colaNacosOption.Namespace);
+                        var nacosConfigResult =
+                            colaNacos!.QueryConfigListByNamespace(webApiClientName, colaNacosOption.Namespace);
                         if (nacosConfigResult != null && nacosConfigResult.Data != null)
                         {
                             var result = nacosConfigResult.Data.SingleOrDefault(
@@ -82,18 +87,19 @@ public static class ColaNacosInject
                                     cfg.Group == colaNacosOption.Listeners[0].Group);
                             if (result == null)
                             {
-                                colaNacos!.PublishConfig(webApiClientName, new PublishNacosConfig()
+                                var publishConfig = new PublishNacosConfig()
                                 {
                                     NamespaceId = colaNacosOption.Namespace,
                                     Group = colaNacosOption.Listeners[0].Group,
                                     DataId = colaNacosOption.Listeners[0].DataId,
                                     Desc = colaNacosOption.Listeners[0].Description,
                                     EnumConfigType = EnumNacosConfigType.JSON
-                                });
+                                };
+                                colaNacos!.PublishConfig(webApiClientName, publishConfig);
                             }
                         }
                     }
-                    
+
                     #endregion
                 }
             }
